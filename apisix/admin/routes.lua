@@ -23,7 +23,11 @@ local plugins_encrypt_conf = require("apisix.admin.plugins").encrypt_conf
 local type = type
 local loadstring = loadstring
 local ipairs = ipairs
-local jp = require("jsonpath")
+local jp
+do
+    local ok
+    ok, jp = pcall(require, "jsonpath")
+end
 
 local function validate_post_arg(node)
     if type(node) ~= "table" then
@@ -34,6 +38,9 @@ local function validate_post_arg(node)
     if #node >= 3 and type(node[1]) == "string" and node[1]:find("^post_arg%.") then
         local key = node[1]
         local json_path = "$." .. key:sub(11)  -- Remove "post_arg." prefix
+        if not jp then
+            return true -- Skip validation if jsonpath is not available
+        end
         local _, err = jp.parse(json_path)
         if err then
             return false, err

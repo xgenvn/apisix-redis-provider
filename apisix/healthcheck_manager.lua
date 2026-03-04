@@ -27,7 +27,11 @@ local upstream_utils = require("apisix.utils.upstream")
 local healthcheck
 local tab_clone = core.table.clone
 local timer_every = ngx.timer.every
-local jp = require("jsonpath")
+local jp
+do
+    local ok
+    ok, jp = pcall(require, "jsonpath")
+end
 local config_util = require("apisix.core.config_util")
 
 local _M = {}
@@ -171,10 +175,11 @@ local function timer_create_checker()
             if plugin_name and plugin_name ~= "" then
                 local _, sub_path = config_util.parse_path(resource_path)
                 local json_path = "$." .. sub_path
-                --- the users of the API pass the jsonpath(in resourcepath) to
-                --- upstream_constructor_config which is passed to the
-                --- callback construct_upstream to create an upstream dynamically
-                local upstream_constructor_config = jp.value(res_conf.value, json_path)
+                local upstream_constructor_config
+                if jp then
+                    upstream_constructor_config = jp.value(res_conf.value, json_path)
+                end
+
                 local plugin = require("apisix.plugins." .. plugin_name)
                 upstream = plugin.construct_upstream(upstream_constructor_config)
                 upstream.resource_key = resource_path
@@ -229,10 +234,11 @@ local function timer_working_pool_check()
             if plugin_name and plugin_name ~= "" then
                 local _, sub_path = config_util.parse_path(resource_path)
                 local json_path = "$." .. sub_path
-                --- the users of the API pass the jsonpath(in resourcepath) to
-                --- upstream_constructor_config which is passed to the
-                --- callback construct_upstream to create an upstream dynamically
-                local upstream_constructor_config = jp.value(res_conf.value, json_path)
+                local upstream_constructor_config
+                if jp then
+                    upstream_constructor_config = jp.value(res_conf.value, json_path)
+                end
+
                 local plugin = require("apisix.plugins." .. plugin_name)
                 upstream = plugin.construct_upstream(upstream_constructor_config)
                 upstream.resource_key = resource_path
