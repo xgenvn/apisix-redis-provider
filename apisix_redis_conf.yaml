@@ -1,0 +1,25 @@
+deployment:
+  role: traditional
+  role_traditional:
+    config_provider: redis
+  admin:
+    allow_admin:
+      - 0.0.0.0/0
+    admin_key:
+      - name: admin
+        key: edd1c9f0985e76a2
+        role: admin
+  redis:
+    host:
+      - redis
+    port: 6379
+    prefix: /apisix
+    timeout: 1000
+    resync_delay: 5
+
+apisix:
+  node_listen: 9080
+  enable_admin: true
+  show_upstream_status_in_response_header: true
+  dns_resolver:
+    - 127.0.0.11

@@ -387,6 +387,13 @@ local _M = {
       tls = {
         verify = true
       }
+    },
+    redis = {
+      host = { "127.0.0.1" },
+      port = 6379,
+      prefix = "/apisix",
+      timeout = 1000,
+      resync_delay = 5
     }
   }
 }

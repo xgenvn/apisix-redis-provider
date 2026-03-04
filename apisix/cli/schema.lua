@@ -67,6 +67,41 @@ local etcd_schema = {
     required = {"prefix", "host"}
 }
 
+local redis_schema = {
+    type = "object",
+    properties = {
+        resync_delay = {
+            type = "integer",
+        },
+        password = {
+            type = "string",
+        },
+        prefix = {
+            type = "string",
+        },
+        host = {
+            type = "array",
+            items = {
+                type = "string",
+            },
+            minItems = 1,
+        },
+        port = {
+            type = "integer",
+            default = 6379,
+        },
+        database = {
+            type = "integer",
+            default = 0,
+        },
+        timeout = {
+            type = "integer",
+            default = 1000,
+        },
+    },
+    required = {"prefix", "host"}
+}
+
 local config_schema = {
     type = "object",
     properties = {
@@ -291,6 +326,7 @@ local config_schema = {
             }
         },
         etcd = etcd_schema,
+        redis = redis_schema,
         plugins = {
             type = "array",
             default = {},
@@ -386,40 +422,42 @@ local deployment_schema = {
     traditional = {
         properties = {
             etcd = etcd_schema,
+            redis = redis_schema,
             admin = admin_schema,
             role_traditional = {
                 properties = {
                     config_provider = {
-                        enum = {"etcd", "yaml"}
+                        enum = {"etcd", "yaml", "redis"}
                     },
                 },
                 required = {"config_provider"}
             }
         },
-        required = {"etcd"}
     },
     control_plane = {
         properties = {
             etcd = etcd_schema,
+            redis = redis_schema,
             admin = admin_schema,
             role_control_plane = {
                 properties = {
                     config_provider = {
-                        enum = {"etcd"}
+                        enum = {"etcd", "redis"}
                     },
                 },
                 required = {"config_provider"}
             },
         },
-        required = {"etcd", "role_control_plane"}
+        required = {"role_control_plane"}
     },
     data_plane = {
         properties = {
             etcd = etcd_schema,
+            redis = redis_schema,
             role_data_plane = {
                 properties = {
                     config_provider = {
-                        enum = {"etcd", "yaml", "json", "xds"}
+                        enum = {"etcd", "yaml", "json", "xds", "redis"}
                     },
                 },
                 required = {"config_provider"}

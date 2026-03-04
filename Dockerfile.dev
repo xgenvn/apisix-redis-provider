@@ -1,0 +1,48 @@
+FROM debian:bullseye-slim
+
+USER root
+
+# Install basic tools and build dependencies
+RUN apt-get update && \
+    apt-get install -y \
+        sudo \
+        wget \
+        curl \
+        lsb-release \
+        gnupg \
+        git \
+        make \
+        gcc \
+        g++ \
+        libpcre3 \
+        libpcre3-dev \
+        libldap2-dev \
+        libyaml-dev \
+        unzip \
+        perl \
+        cpanminus \
+        patch \
+        libssl-dev
+
+WORKDIR /usr/local/apisix
+
+# Copy necessary files for dependency installation
+# We use the official scripts to ensure compatibility
+COPY utils/install-dependencies.sh ./utils/
+COPY utils/linux-install-luarocks.sh ./utils/
+COPY apisix-master-0.rockspec .
+COPY Makefile .
+COPY .requirements .
+
+# Install OpenResty, LuaRocks and APISIX dependencies
+RUN make deps
+
+# Set up environment path for OpenResty and APISIX
+ENV PATH=$PATH:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:/usr/local/openresty/bin:/usr/local/apisix/bin
+
+# Forward ports
+EXPOSE 9080 9180 9443
+
+# The source code will be mounted at /usr/local/apisix at runtime.
+# Using 'apisix' command directly as it is now in PATH.
+CMD ["sh", "-c", "apisix init && apisix init_etcd && apisix start && tail -f logs/error.log"]

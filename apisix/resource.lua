@@ -30,6 +30,8 @@ local function remove_etcd_prefix(key)
     role, "config_provider")
     if provider == "etcd" and local_conf.etcd and local_conf.etcd.prefix then
         prefix = local_conf.etcd.prefix
+    elseif provider == "redis" and local_conf.deployment.redis and local_conf.deployment.redis.prefix then
+        prefix = local_conf.deployment.redis.prefix
     end
     return string_sub(key, #prefix + 1)
 end
