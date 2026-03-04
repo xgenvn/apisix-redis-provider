@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 local redis_new     = require("resty.redis").new
-local core          = require("apisix.core")
+local log           = require("apisix.core.log")
 
 
 local _M = {version = 0.1}
@@ -33,13 +33,13 @@ local function redis_cli(conf)
 
     local ok, err = red:connect(conf.redis_host, conf.redis_port or 6379, sock_opts)
     if not ok then
-        core.log.error(" redis connect error, error: ", err)
+        log.error(" redis connect error, error: ", err)
         return false, err
     end
 
     local count
     count, err = red:get_reused_times()
-    core.log.debug("redis connection reused times: ", count)
+    log.debug("redis connection reused times: ", count)
     if 0 == count then
         if conf.redis_password and conf.redis_password ~= '' then
             local ok, err
