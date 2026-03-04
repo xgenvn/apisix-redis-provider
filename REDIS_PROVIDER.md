@@ -53,7 +53,17 @@ _M.etcd = _M.config_store
 ## 6. Running and Verification (Docker Compose)
 A `docker-compose.redis-provider.yaml` and `apisix_redis_conf.yaml` are provided to run APISIX with the Redis configuration provider.
 
-1. **Start the environment**:
+1. **Build the development image**:
+   ```bash
+   docker-compose -f docker-compose.redis-provider.yaml build
+   ```
+
+2. **Install dependencies (Optional, if host deps are missing)**:
+   ```bash
+   docker-compose -f docker-compose.redis-provider.yaml run --rm apisix make deps
+   ```
+
+3. **Start the environment**:
    ```bash
    docker-compose -f docker-compose.redis-provider.yaml up -d
    ```

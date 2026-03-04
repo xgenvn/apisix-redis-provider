@@ -1,5 +1,26 @@
 FROM apache/apisix:3.11.0-debian
-# This Dockerfile is used for development purposes, mounting the local repo.
+
 USER root
-RUN apt-get update && apt-get install -y make git
-RUN luarocks install multipart 0.5.11-1
+
+# Install development tools and libraries
+RUN apt-get update && \
+    apt-get install -y \
+        gcc \
+        make \
+        git \
+        libssl-dev \
+        libyaml-dev \
+        wget \
+        curl \
+        unzip \
+        sudo
+
+# APISIX official luarocks installation script
+RUN wget https://raw.githubusercontent.com/apache/apisix/master/utils/linux-install-luarocks.sh && \
+    sh linux-install-luarocks.sh && \
+    rm linux-install-luarocks.sh
+
+WORKDIR /usr/local/apisix
+
+# Set up the environment to allow running make deps
+# We don't run it here because we will mount the repo at runtime
