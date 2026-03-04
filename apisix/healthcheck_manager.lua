@@ -27,11 +27,7 @@ local upstream_utils = require("apisix.utils.upstream")
 local healthcheck
 local tab_clone = core.table.clone
 local timer_every = ngx.timer.every
-local jp
-do
-    local ok
-    ok, jp = pcall(require, "jsonpath")
-end
+local jp = require("jsonpath")
 local config_util = require("apisix.core.config_util")
 
 local _M = {}
@@ -175,10 +171,7 @@ local function timer_create_checker()
             if plugin_name and plugin_name ~= "" then
                 local _, sub_path = config_util.parse_path(resource_path)
                 local json_path = "$." .. sub_path
-                local upstream_constructor_config
-                if jp then
-                    upstream_constructor_config = jp.value(res_conf.value, json_path)
-                end
+                local upstream_constructor_config = jp.value(res_conf.value, json_path)
 
                 local plugin = require("apisix.plugins." .. plugin_name)
                 upstream = plugin.construct_upstream(upstream_constructor_config)
@@ -234,10 +227,7 @@ local function timer_working_pool_check()
             if plugin_name and plugin_name ~= "" then
                 local _, sub_path = config_util.parse_path(resource_path)
                 local json_path = "$." .. sub_path
-                local upstream_constructor_config
-                if jp then
-                    upstream_constructor_config = jp.value(res_conf.value, json_path)
-                end
+                local upstream_constructor_config = jp.value(res_conf.value, json_path)
 
                 local plugin = require("apisix.plugins." .. plugin_name)
                 upstream = plugin.construct_upstream(upstream_constructor_config)

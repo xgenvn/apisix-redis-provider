@@ -29,33 +29,10 @@ local tablepool    = require("tablepool")
 local get_var      = require("resty.ngxvar").fetch
 local get_request  = require("resty.ngxvar").request
 local ck           = require "resty.cookie"
-local multipart
-do
-    local ok
-    ok, multipart = pcall(require, "multipart")
-    if not ok then
-        multipart = nil
-        log.warn("failed to load multipart, multipart form data parsing will be disabled")
-    end
-end
+local multipart    = require("multipart")
 local util         = require("apisix.cli.util")
-local gq_parse
-do
-    local ok, res = pcall(require, "graphql")
-    if ok then
-        gq_parse = res.parse
-    else
-        log.warn("failed to load graphql, graphql parsing will be disabled")
-    end
-end
-local jp
-do
-    local ok
-    ok, jp = pcall(require, "jsonpath")
-    if not ok then
-        log.warn("failed to load jsonpath, jsonpath expressions will be disabled")
-    end
-end
+local gq_parse     = require("graphql").parse
+local jp           = require("jsonpath")
 local setmetatable = setmetatable
 local sub_str      = string.sub
 local ngx          = ngx
@@ -140,9 +117,6 @@ local function parse_graphql(ctx)
         return nil, err
     end
 
-    if not gq_parse then
-        return nil, "graphql is not installed"
-    end
     local ok, res = pcall(gq_parse, body)
     if not ok then
         return nil, "failed to parse graphql: " .. res .. " body: " .. body
@@ -220,9 +194,6 @@ local function get_parsed_request_body(ctx)
     end
 
     if core_str.find(ct_header, CONTENT_TYPE_MULTIPART_FORM) then
-        if not multipart then
-            return nil, "multipart is not installed"
-        end
         local body = request.get_body()
         local res = multipart(body, ct_header)
         if not res then
@@ -384,10 +355,6 @@ do
                     return nil
                 end
                 if arg_key:find("[%[%*]") or arg_key:find("..", 1, true) then
-                    if not jp then
-                        log.warn("jsonpath is not installed, cannot query post args")
-                        return nil
-                    end
                     arg_key = "$." .. arg_key
                     local results = jp.query(parsed_body, arg_key)
                     if #results == 0 then

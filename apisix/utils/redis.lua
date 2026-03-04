@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 local redis_new     = require("resty.redis").new
-local ngx           = ngx
+local core          = require("apisix.core")
 
 
 local _M = {version = 0.1}
@@ -33,13 +33,13 @@ local function redis_cli(conf)
 
     local ok, err = red:connect(conf.redis_host, conf.redis_port or 6379, sock_opts)
     if not ok then
-        ngx.log(ngx.ERR, " redis connect error, error: ", err)
+        core.log.error(" redis connect error, error: ", err)
         return false, err
     end
 
     local count
     count, err = red:get_reused_times()
-    ngx.log(ngx.DEBUG, "redis connection reused times: ", count)
+    core.log.debug("redis connection reused times: ", count)
     if 0 == count then
         if conf.redis_password and conf.redis_password ~= '' then
             local ok, err
@@ -61,7 +61,6 @@ local function redis_cli(conf)
             end
         end
     elseif err then
-        -- core.log.info(" err: ", err)
         return nil, err
     end
     return red, nil

@@ -36,11 +36,11 @@ end
 
 config.type = config_provider
 
-local etcd
+local config_store
 if config_provider == "redis" then
-    etcd = require("apisix.core.redis_store")
+    config_store = require("apisix.core.redis_store")
 else
-    etcd = require("apisix.core.etcd")
+    config_store = require("apisix.core.etcd")
 end
 
 
@@ -64,7 +64,8 @@ return {
     io          = require("apisix.core.io"),
     utils       = utils,
     dns_client  = require("apisix.core.dns.client"),
-    etcd        = etcd,
+    config_store = config_store,
+    etcd        = config_store,
     tablepool   = require("tablepool"),
     resolver    = require("apisix.core.resolver"),
     os          = require("apisix.core.os"),
