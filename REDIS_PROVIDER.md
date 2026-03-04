@@ -57,16 +57,13 @@ A `docker-compose.redis-provider.yaml` and `apisix_redis_conf.yaml` are provided
    ```bash
    docker-compose -f docker-compose.redis-provider.yaml build
    ```
+   This will install OpenResty and all necessary dependencies from scratch to avoid conflicts with pre-installed packages.
 
-2. **Install dependencies (Optional, if host deps are missing)**:
-   ```bash
-   docker-compose -f docker-compose.redis-provider.yaml run --rm apisix make deps
-   ```
-
-3. **Start the environment**:
+2. **Start the environment**:
    ```bash
    docker-compose -f docker-compose.redis-provider.yaml up -d
    ```
+   The source code is mounted from your host, allowing for live development.
 
 2. **Verify Admin API works with Redis**:
    ```bash

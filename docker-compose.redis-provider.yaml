@@ -26,8 +26,10 @@ services:
     volumes:
       - .:/usr/local/apisix
       - ./apisix_redis_conf.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - /usr/local/apisix/deps
       - /usr/local/apisix/logs
       - /usr/local/apisix/conf
+
     depends_on:
       - redis
     ports:
