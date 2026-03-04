@@ -1,0 +1,5 @@
+FROM apache/apisix:3.11.0-debian
+# This Dockerfile is used for development purposes, mounting the local repo.
+USER root
+RUN apt-get update && apt-get install -y make git
+RUN luarocks install multipart 0.5.11-1
